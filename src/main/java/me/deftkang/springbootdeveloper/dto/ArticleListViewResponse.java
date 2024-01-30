@@ -3,9 +3,11 @@ package me.deftkang.springbootdeveloper.dto;
 import lombok.Getter;
 import me.deftkang.springbootdeveloper.domain.Article;
 
+import java.util.UUID;
+
 @Getter
 public class ArticleListViewResponse {
-    private final Long id;
+    private final UUID id;
     private final String title;
     private final String content;
 

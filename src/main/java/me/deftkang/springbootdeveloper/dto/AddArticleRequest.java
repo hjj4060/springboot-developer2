@@ -20,6 +20,7 @@ public class AddArticleRequest {
     public Article toEntity() {
         return Article.builder()
                 .title(title)
-                .content(content).build();
+                .content(content)
+                .build();
     }
 }

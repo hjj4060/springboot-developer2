@@ -8,7 +8,12 @@ import me.deftkang.springbootdeveloper.repository.BlogRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Period;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -26,21 +31,32 @@ public class BlogService {
     }
 
     @Transactional(readOnly = true)
-    public Article findById(long id) {
+    public Article findById(UUID id) {
         return blogRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("not found: " + id));
     }
 
-    public void delete(long id) {
+    public void delete(UUID id) {
         blogRepository.deleteById(id);
     }
 
     @Transactional
-    public Article update(long id, UpdateArticleRequest request) {
+    public Article update(UUID id, UpdateArticleRequest request) {
         Article article = blogRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("not found: " + id));
 
-        article.update(request.getTitle(), request.getContent());
+        /**
+         * 날짜 비교
+         *  createdAt은 LocalDateTime 으로 받아옴
+         *  LocalDateTime의 compareTo 함수는 비교하는 2개의 날짜가 같으면 시간까지 고려함
+         *  그래서 LocalDate로 바꿔서 비교
+         */
+        LocalDate localDate = LocalDate.now();
+        int diffDate = localDate.compareTo(article.getCreatedAt().toLocalDate());
+
+        if (diffDate < 10) {
+            article.update(request.getTitle(), request.getContent());
+        }
 
         return article;
     }

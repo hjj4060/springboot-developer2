@@ -51,6 +51,8 @@ if (createButton) {
         }).then(() => {
             alert("등록 완료되었습니다.");
             location.replace("/articles");
+        }).catch(() => {
+            alert("유효성 에러")
         });
     })
 }
