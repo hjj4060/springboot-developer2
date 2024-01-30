@@ -8,6 +8,7 @@ import me.deftkang.springbootdeveloper.dto.UpdateArticleRequest;
 import me.deftkang.springbootdeveloper.service.BlogService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,8 +20,10 @@ public class BlogApiController {
     private final BlogService blogService;
 
     @PostMapping("/api/articles")
-    public ResponseEntity<Article> addArticle(@RequestBody AddArticleRequest request) {
+    public ResponseEntity<Article> addArticle(@Validated @RequestBody AddArticleRequest request, BindingResult bindingResult) {
         Article savedArticle = blogService.save(request);
+
+        System.out.println(bindingResult.getErrorCount());
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(savedArticle);

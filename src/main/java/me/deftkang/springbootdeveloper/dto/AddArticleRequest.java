@@ -1,5 +1,6 @@
 package me.deftkang.springbootdeveloper.dto;
 
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,7 +11,10 @@ import me.deftkang.springbootdeveloper.domain.Article;
 @AllArgsConstructor
 @Getter
 public class AddArticleRequest {
+    @Size(max = 5)
     private String title;
+
+    @Size(max = 5)
     private String content;
 
     public Article toEntity() {
