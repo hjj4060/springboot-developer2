@@ -29,12 +29,11 @@ public class Article extends BaseEntity {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "content", nullable = false)
+    @Column(name = "content", nullable = false, length = 3000)
     private String content;
 
     @Builder
     public Article(String title, String content) {
-        super();
         this.title = title;
         this.content = content;
     }

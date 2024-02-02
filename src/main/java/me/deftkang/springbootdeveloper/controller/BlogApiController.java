@@ -41,6 +41,7 @@ public class BlogApiController {
     @Operation(summary = "블로그 전체 글을 가져오는 API 입니다.")
     @GetMapping("/api/articles")
     public ResponseEntity<List<ArticleResponse>> findAllArticles() {
+        //엔티티를 DTO로 변경하여 리스트에 담는 작업
         List<ArticleResponse> articles = blogService.findAll()
                 .stream()
                 .map(ArticleResponse::new)
@@ -50,8 +51,21 @@ public class BlogApiController {
                 .body(articles);
     }
 
+    @Operation(summary = "블로그 전체 글을 가져오는 API 입니다. 정렬 기능이 있습니다. 1이 오름차순, 2가 내림차순")
+    @GetMapping("/api/articles/{createdOrderByFlag}")
+    public ResponseEntity<List<ArticleResponse>> findAllArticles(@PathVariable Integer createdOrderByFlag) {
+        //엔티티를 DTO로 변경하여 리스트에 담는 작업
+        List<ArticleResponse> articles = blogService.findAll(createdOrderByFlag)
+                .stream()
+                .map(ArticleResponse::new)
+                .toList();
+
+        return ResponseEntity.ok()
+                .body(articles);
+    }
+
     @Operation(summary = "블로그 한개 글을 가져오는 API 입니다.")
-    @GetMapping("/api/articles/{id}")
+    @GetMapping("/api/article/{id}")
     public ResponseEntity<ArticleResponse> findArticle(@PathVariable UUID id) {
         Article article = blogService.findById(id);
 
@@ -60,7 +74,7 @@ public class BlogApiController {
     }
 
     @Operation(summary = "블로그 글을 삭제하는 API 입니다.")
-    @DeleteMapping("api/articles/{id}")
+    @DeleteMapping("api/article/{id}")
     public ResponseEntity<Void> deleteArticle(@PathVariable UUID id) {
         blogService.delete(id);
 
@@ -69,7 +83,7 @@ public class BlogApiController {
     }
 
     @Operation(summary = "블로그 글을 수정하는 API 입니다.")
-    @PutMapping("api/articles/{id}")
+    @PutMapping("api/article/{id}")
     public ResponseEntity<Article> updateArticle(@PathVariable UUID id,
                                                  @RequestBody UpdateArticleRequest request) {
 

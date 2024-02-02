@@ -71,6 +71,8 @@ class trollerTest {
         assertThat(articles.size()).isEqualTo(1);
         assertThat(articles.get(0).getTitle()).isEqualTo(title);
         assertThat(articles.get(0).getContent()).isEqualTo(content);
+        assertThat(articles.get(0).getCreatedAt()).isNotNull();
+        assertThat(articles.get(0).getUpdatedAt()).isNotNull();
     }
 
     @DisplayName("findAllArticles: 블로그 글 목록 조회에 성공한다.")
@@ -86,6 +88,27 @@ class trollerTest {
                 .build());
 
         final ResultActions resultActions = mockMvc.perform(get(url)
+                .accept(MediaType.APPLICATION_JSON));
+
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].content").value(content))
+                .andExpect(jsonPath("$[0].title").value(title));
+    }
+
+    @DisplayName("findAllArticles: 블로그 글 목록 created 정렬 적용 조회에 성공한다.")
+    @Test
+    public void findAllArticlesCreatedOrderBy() throws Exception {
+        final String url = "/api/articles/{createdOrderByFlag}";
+        final String title = "title";
+        final String content = "content";
+
+        blogRepository.save(Article.builder()
+                .title(title)
+                .content(content)
+                .build());
+
+        final ResultActions resultActions = mockMvc.perform(get(url, 1)
                 .accept(MediaType.APPLICATION_JSON));
 
         resultActions
@@ -116,7 +139,7 @@ class trollerTest {
 
     @DisplayName("deleteArticle: 블로그 글 삭제에 성공한다.")
     @Test
-    public void deltedArticle() throws Exception {
+    public void deletedArticle() throws Exception {
         final String url = "/api/articles/{id}";
         final String title = "title";
         final String content = "content";

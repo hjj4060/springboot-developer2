@@ -31,7 +31,18 @@ public class BlogViewController {
         return "articleList";
     }
 
-    @GetMapping("/articles/{id}")
+    @GetMapping("/articles/{createdOrderByFlag}")
+    public String getArticles(@PathVariable int createdOrderByFlag, Model model) {
+        List<ArticleListViewResponse> articles = blogService.findAll(createdOrderByFlag).stream()
+                .map(ArticleListViewResponse::new)
+                .toList();
+
+        model.addAttribute("articles", articles);
+
+        return "articleList";
+    }
+
+    @GetMapping("/article/{id}")
     public String getArticle(@PathVariable UUID id, Model model) {
         Article article = blogService.findById(id);
         model.addAttribute("article", new ArticleViewResponse(article));

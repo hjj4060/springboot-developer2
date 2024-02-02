@@ -26,8 +26,21 @@ public class BlogService {
     }
 
     //article 테이블에 저장되어 있는 모든 데이터 조회
+    //findAll() 함수는 Entity객체를 담은 List가 반환됨
     public List<Article> findAll() {
         return blogRepository.findAll();
+    }
+
+    public List<Article> findAll(int createdOrderByFlag) {
+        List<Article> findAllArticles = null;
+
+        if (createdOrderByFlag == 1) {
+            findAllArticles = blogRepository.findAllByOrderByCreatedAtAsc();
+        } else {
+            findAllArticles = blogRepository.findAllByOrderByCreatedAtDesc();
+        }
+
+        return findAllArticles;
     }
 
     @Transactional(readOnly = true)
