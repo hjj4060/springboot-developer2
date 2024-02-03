@@ -21,19 +21,11 @@ public class BlogViewController {
     private final BlogService blogService;
 
     @GetMapping("/articles")
-    public String getArticles(Model model) {
-        List<ArticleListViewResponse> articles = blogService.findAll().stream()
-                .map(ArticleListViewResponse::new)
-                .toList();
-
-        model.addAttribute("articles", articles);
-
-        return "articleList";
-    }
-
-    @GetMapping("/articles/{createdOrderByFlag}")
-    public String getArticles(@PathVariable int createdOrderByFlag, Model model) {
-        List<ArticleListViewResponse> articles = blogService.findAll(createdOrderByFlag).stream()
+    public String getArticles(
+            @RequestParam(name = "createdOrder", defaultValue = "1") int createdOrder,
+            @RequestParam(name ="title", required = false) String title
+            , Model model) {
+        List<ArticleListViewResponse> articles = blogService.findAll(createdOrder, title).stream()
                 .map(ArticleListViewResponse::new)
                 .toList();
 

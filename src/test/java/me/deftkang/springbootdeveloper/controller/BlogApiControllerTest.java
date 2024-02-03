@@ -5,6 +5,7 @@ import me.deftkang.springbootdeveloper.domain.Article;
 import me.deftkang.springbootdeveloper.dto.AddArticleRequest;
 import me.deftkang.springbootdeveloper.dto.UpdateArticleRequest;
 import me.deftkang.springbootdeveloper.repository.BlogRepository;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,10 +21,7 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -96,10 +94,10 @@ class trollerTest {
                 .andExpect(jsonPath("$[0].title").value(title));
     }
 
-    @DisplayName("findAllArticles: 블로그 글 목록 created 정렬 적용 조회에 성공한다.")
+    @DisplayName("findAllArticles: 블로그 글 목록 created 역정렬 적용 조회에 성공한다.")
     @Test
     public void findAllArticlesCreatedOrderBy() throws Exception {
-        final String url = "/api/articles/{createdOrderByFlag}";
+        final String url = "/api/articles";
         final String title = "title";
         final String content = "content";
 
@@ -108,19 +106,28 @@ class trollerTest {
                 .content(content)
                 .build());
 
-        final ResultActions resultActions = mockMvc.perform(get(url, 1)
+        final String title2 = "title2";
+        final String content2 = "content2";
+
+        blogRepository.save(Article.builder()
+                .title(title2)
+                .content(content2)
+                .build());
+
+        final ResultActions resultActions = mockMvc.perform(get(url)
+                        .param("createdOrder", "2")
                 .accept(MediaType.APPLICATION_JSON));
 
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].content").value(content))
-                .andExpect(jsonPath("$[0].title").value(title));
+                .andExpect(jsonPath("$[0].content").value(content2))
+                .andExpect(jsonPath("$[0].title").value(title2));
     }
 
     @DisplayName("findArticle: 블로그 글 조회에 성공한다.")
     @Test
     public void findArticle() throws Exception {
-        final String url = "/api/articles/{id}";
+        final String url = "/api/article/{id}";
         final String title = "title";
         final String content = "content";
 
@@ -140,7 +147,7 @@ class trollerTest {
     @DisplayName("deleteArticle: 블로그 글 삭제에 성공한다.")
     @Test
     public void deletedArticle() throws Exception {
-        final String url = "/api/articles/{id}";
+        final String url = "/api/article/{id}";
         final String title = "title";
         final String content = "content";
 
@@ -160,7 +167,7 @@ class trollerTest {
     @DisplayName("updateArticle: 블로그 글 수정에 성공한다.")
     @Test
     public void updateArticle() throws Exception {
-        final String url = "/api/articles/{id}";
+        final String url = "/api/article/{id}";
         final String title = "title";
         final String content = "content";
 
@@ -184,5 +191,31 @@ class trollerTest {
 
         assertThat(article.getTitle()).isEqualTo(newTitle);
         assertThat(article.getContent()).isEqualTo(newContent);
+    }
+
+    @Test
+    @DisplayName("글 삭제 필드 업데이트에 성공한다.")
+    public void updateArticleDeleteAt() throws Exception {
+        final String url = "/api/article/{id}";
+        final String title = "title";
+        final String content = "content";
+
+        Article savedArticle = blogRepository.save(Article.builder()
+                .title(title)
+                .content(content)
+                .build());
+
+        //then
+        //새로운 글 추가시 deleteAt 필드 null인지 확인
+        Assertions.assertThat(savedArticle.getDeletedAt()).isNull();
+
+        //when
+        //deletedAt 필드 업데이트
+        ResultActions resultActions = mockMvc.perform(patch(url, savedArticle.getId()))
+                .andExpect(status().isOk());
+
+        Article article = blogRepository.findById(savedArticle.getId()).get();
+
+        Assertions.assertThat(article.getDeletedAt()).isNotNull();
     }
 }

@@ -31,19 +31,31 @@ public class BlogService {
         return blogRepository.findAll();
     }
 
-    public List<Article> findAll(int createdOrderByFlag) {
+    public List<Article> findAll(int createdOrderByFlag, String title) {
         List<Article> findAllArticles = null;
 
-        if (createdOrderByFlag == 1) {
-            findAllArticles = blogRepository.findAllByOrderByCreatedAtAsc();
+        if(title == null) {
+            if (createdOrderByFlag == 1) {
+//                findAllArticles = blogRepository.findAllByOrderByCreatedAtAsc();
+                findAllArticles = blogRepository.findAllByDeletedAtIsNullOrderByCreatedAtAsc();
+            } else {
+//                findAllArticles = blogRepository.findAllByOrderByCreatedAtDesc();
+                findAllArticles = blogRepository.findAllByDeletedAtIsNullOrderByCreatedAtDesc();
+            }
         } else {
-            findAllArticles = blogRepository.findAllByOrderByCreatedAtDesc();
+            if (createdOrderByFlag == 1) {
+//                findAllArticles = blogRepository.findAllByOrderByCreatedAtAscAndTitle(title);
+                findAllArticles = blogRepository.findAllByDeletedAtIsNullOrderByCreatedAtAscAndTitle(title);
+            } else {
+//                findAllArticles = blogRepository.findAllByOrderByCreatedAtDescAndTitle(title);
+                findAllArticles = blogRepository.findAllByDeletedAtIsNullOrderByCreatedAtDescAndTitle(title);
+            }
         }
 
         return findAllArticles;
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true) //readOnly 옵션 true로 하면 락을 안건다??
     public Article findById(UUID id) {
         return blogRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("not found: " + id));
@@ -53,10 +65,19 @@ public class BlogService {
         blogRepository.deleteById(id);
     }
 
+    //@transactional 이 없으면 엔티티 수정시 업데이트가 되지않는다.
+    @Transactional
+    //deltedAt을 업데이트 하지만 DTO를 사용하지 않음
+    public Article updateDeleteAt(UUID id) {
+        Article article = articleValidCheck(id);
+        article.setDeletedAt(LocalDateTime.now());
+
+        return article;
+    }
+
     @Transactional
     public Article update(UUID id, UpdateArticleRequest request) {
-        Article article = blogRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("not found: " + id));
+        Article article = articleValidCheck(id);
 
         /**
          * 날짜 비교
@@ -70,6 +91,13 @@ public class BlogService {
         if (diffDate < 10) {
             article.update(request.getTitle(), request.getContent());
         }
+
+        return article;
+    }
+
+    private Article articleValidCheck(UUID id) {
+        Article article = blogRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("not found: " + id));
 
         return article;
     }

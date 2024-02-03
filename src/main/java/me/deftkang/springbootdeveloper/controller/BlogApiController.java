@@ -38,24 +38,13 @@ public class BlogApiController {
                 .body(savedArticle);
     }
 
-    @Operation(summary = "블로그 전체 글을 가져오는 API 입니다.")
-    @GetMapping("/api/articles")
-    public ResponseEntity<List<ArticleResponse>> findAllArticles() {
-        //엔티티를 DTO로 변경하여 리스트에 담는 작업
-        List<ArticleResponse> articles = blogService.findAll()
-                .stream()
-                .map(ArticleResponse::new)
-                .toList();
-
-        return ResponseEntity.ok()
-                .body(articles);
-    }
-
     @Operation(summary = "블로그 전체 글을 가져오는 API 입니다. 정렬 기능이 있습니다. 1이 오름차순, 2가 내림차순")
-    @GetMapping("/api/articles/{createdOrderByFlag}")
-    public ResponseEntity<List<ArticleResponse>> findAllArticles(@PathVariable Integer createdOrderByFlag) {
+    @GetMapping("/api/articles")
+    public ResponseEntity<List<ArticleResponse>> findAllArticles(
+            @RequestParam(name = "createdOrder", defaultValue = "1") int createdOrder,
+            @RequestParam(name ="title", required = false) String title) {
         //엔티티를 DTO로 변경하여 리스트에 담는 작업
-        List<ArticleResponse> articles = blogService.findAll(createdOrderByFlag)
+        List<ArticleResponse> articles = blogService.findAll(createdOrder, title)
                 .stream()
                 .map(ArticleResponse::new)
                 .toList();
@@ -77,6 +66,15 @@ public class BlogApiController {
     @DeleteMapping("api/article/{id}")
     public ResponseEntity<Void> deleteArticle(@PathVariable UUID id) {
         blogService.delete(id);
+
+        return ResponseEntity.ok()
+                .build();
+    }
+
+    @Operation(summary = "블로그 글을 삭제 날짜를 업데이트 하는 API 입니다.")
+    @PatchMapping("api/article/{id}") //Article의 deltedAt 필드만 수정하는거여서 PatchMapping 사용
+    public ResponseEntity<Void> updateArticleDeleteAt(@PathVariable UUID id) {
+        Article article = blogService.updateDeleteAt(id);
 
         return ResponseEntity.ok()
                 .build();
