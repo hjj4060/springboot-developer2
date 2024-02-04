@@ -3,6 +3,8 @@ package me.deftkang.springbootdeveloper.dto;
 import lombok.Getter;
 import me.deftkang.springbootdeveloper.domain.Article;
 
+import java.time.LocalDateTime;
+
 @Getter
 public class ArticleResponse {
     private final String title;
