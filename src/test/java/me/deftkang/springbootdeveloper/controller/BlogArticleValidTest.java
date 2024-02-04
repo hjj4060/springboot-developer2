@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
-public class BlogAddArticleValidTest {
+public class BlogArticleValidTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -167,7 +167,7 @@ public class BlogAddArticleValidTest {
     }
 
     @Test
-    @DisplayName("모든 글 조회시 title 조건 체크")
+    @DisplayName("모든 글 조회시 title 입력 조건 체크")
     void blogFindAllTitleValid_O() throws Exception {
         final String url = "/api/articles";
         final String title = "title";
@@ -191,7 +191,7 @@ public class BlogAddArticleValidTest {
     }
 
     @Test
-    @DisplayName("모든 글 조회시 title 조건 체크")
+    @DisplayName("모든 글 조회시 title 입력 조건 체크")
     void blogFindAllTitleValid_X() throws Exception {
         final String url = "/api/articles";
         final String title = "title";
@@ -231,7 +231,6 @@ public class BlogAddArticleValidTest {
                 .andExpect(status().isOk());
         Article article = blogRepository.findById(savedArticle.getId()).get();
         Assertions.assertThat(article.getDeletedAt()).isNotNull(); //deleteAt이 정상적으로 들어갔는지 확인
-
 
         final String forFindAllUrl = "/api/articles";
         ResultActions resultActions2 = mockMvc.perform(get(forFindAllUrl)

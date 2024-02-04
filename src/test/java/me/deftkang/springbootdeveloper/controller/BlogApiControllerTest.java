@@ -1,8 +1,10 @@
 package me.deftkang.springbootdeveloper.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import me.deftkang.springbootdeveloper.domain.Article;
 import me.deftkang.springbootdeveloper.dto.AddArticleRequest;
+import me.deftkang.springbootdeveloper.dto.ArticleViewResponse;
 import me.deftkang.springbootdeveloper.dto.UpdateArticleRequest;
 import me.deftkang.springbootdeveloper.repository.BlogRepository;
 import org.assertj.core.api.Assertions;
@@ -18,6 +20,8 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class trollerTest {
+class BlogApiControllerTest {
     @Autowired
     protected MockMvc mockMvc;
 
@@ -217,5 +221,31 @@ class trollerTest {
         Article article = blogRepository.findById(savedArticle.getId()).get();
 
         Assertions.assertThat(article.getDeletedAt()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("글 상세 조회시 수정 가능한 남은 날짜 조회")
+    public void remainingModifiableDate() throws Exception {
+        final String url = "/api/article/{id}";
+        final String title = "title";
+        final String content = "content";
+
+        Article savedArticle = blogRepository.save(Article.builder()
+                .title(title)
+                .content(content)
+                .build());
+
+        savedArticle.setCreatedAt(LocalDateTime.now().minusDays(10));
+
+        UpdateArticleRequest request = new UpdateArticleRequest("new title", "new content");
+
+        ResultActions result = mockMvc.perform(put(url, savedArticle.getId())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(request)));
+
+        ArticleViewResponse response = new ArticleViewResponse(savedArticle);
+        System.out.println(response.getModifiableDate());
+
+        Assertions.assertThat(response.getModifiableDate()).isNotNull();
     }
 }

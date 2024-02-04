@@ -23,7 +23,7 @@ public class BlogViewController {
     @GetMapping("/articles")
     public String getArticles(
             @RequestParam(name = "createdOrder", defaultValue = "1") int createdOrder,
-            @RequestParam(name ="title", required = false) String title
+            @RequestParam(name = "title", required = false) String title
             , Model model) {
         List<ArticleListViewResponse> articles = blogService.findAll(createdOrder, title).stream()
                 .map(ArticleListViewResponse::new)

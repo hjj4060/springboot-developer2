@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -79,18 +80,14 @@ public class BlogService {
     public Article update(UUID id, UpdateArticleRequest request) {
         Article article = articleValidCheck(id);
 
-        /**
-         * 날짜 비교
-         *  createdAt은 LocalDateTime 으로 받아옴
-         *  LocalDateTime의 compareTo 함수는 비교하는 2개의 날짜가 같으면 시간까지 고려함
-         *  그래서 LocalDate로 바꿔서 비교
-         */
         LocalDate localDate = LocalDate.now();
-        int diffDate = localDate.compareTo(article.getCreatedAt().toLocalDate());
+        long diffDate = ChronoUnit.DAYS.between(article.getCreatedAt().toLocalDate(), localDate);
 
-        if (diffDate < 10) {
-            article.update(request.getTitle(), request.getContent());
+        if (diffDate >= 10) {
+            throw new IllegalStateException("게시물 수정 기간이 지났습니다.");
         }
+
+        article.update(request.getTitle(), request.getContent());
 
         return article;
     }

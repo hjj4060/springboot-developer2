@@ -42,7 +42,7 @@ public class BlogApiController {
     @GetMapping("/api/articles")
     public ResponseEntity<List<ArticleResponse>> findAllArticles(
             @RequestParam(name = "createdOrder", defaultValue = "1") int createdOrder,
-            @RequestParam(name ="title", required = false) String title) {
+            @RequestParam(name = "title", required = false) String title) {
         //엔티티를 DTO로 변경하여 리스트에 담는 작업
         List<ArticleResponse> articles = blogService.findAll(createdOrder, title)
                 .stream()
@@ -82,11 +82,13 @@ public class BlogApiController {
 
     @Operation(summary = "블로그 글을 수정하는 API 입니다.")
     @PutMapping("api/article/{id}")
-    public ResponseEntity<Article> updateArticle(@PathVariable UUID id,
+    public ResponseEntity<?> updateArticle(@PathVariable UUID id,
                                                  @RequestBody UpdateArticleRequest request) {
-
-        Article updatedArticle = blogService.update(id, request);
-
-        return ResponseEntity.ok().body(updatedArticle);
+        try {
+            Article updatedArticle = blogService.update(id, request);
+            return ResponseEntity.ok().body(updatedArticle);
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }
