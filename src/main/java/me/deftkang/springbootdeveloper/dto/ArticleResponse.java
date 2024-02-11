@@ -11,10 +11,14 @@ public class ArticleResponse {
     private final String title;
     private final String content;
     private long modifiableDate;
+    private String warningMessage;
 
     public ArticleResponse(Article article, long modifiableDate) {
         this.title = article.getTitle();
         this.content = article.getContent();
         this.modifiableDate = modifiableDate;
+    }
+    public void setWarningMessage(String warningMessage) {
+        this.warningMessage = warningMessage;
     }
 }
