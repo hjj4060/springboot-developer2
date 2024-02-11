@@ -13,8 +13,8 @@ public class ArticleAPI {
     public long calculateModifiableDate(LocalDateTime createdDatedAt) {
         LocalDate localDate = LocalDate.now();
         long diffDate = ChronoUnit.DAYS.between(createdDatedAt.toLocalDate(), localDate);
-        //생성일이 10일이면 하루 남은걸로 한다.
-        long modifiableDate = (11 - diffDate) > 0 ? (11 - diffDate) : 0;
+        //생성일 - 현재일이 9일이면 하루 남은걸로 한다.
+        long modifiableDate = (10 - diffDate) > 0 ? (10 - diffDate) : 0;
 
         return modifiableDate;
     }

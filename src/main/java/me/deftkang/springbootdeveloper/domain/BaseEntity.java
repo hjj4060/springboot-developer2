@@ -17,11 +17,12 @@ import java.time.LocalDateTime;
 @Setter
 @MappedSuperclass //상속 받은 클래스에도 엔티티 추가
 @NoArgsConstructor
+@SuperBuilder
 @EntityListeners(AuditingEntityListener.class) //@CreatedDate, @LastModifiedDate , @CreatedBy, @LastModifiedBy 사용가능
 public abstract class BaseEntity {
     @CreatedDate
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
+    @Column(name = "created_at")
+    protected LocalDateTime createdAt;
 
     @LastModifiedDate
     @Column(name = "updated_at")

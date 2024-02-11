@@ -83,9 +83,8 @@ public class BlogApiController {
     public ResponseEntity<?> updateArticle(@PathVariable UUID id,
                                                  @RequestBody UpdateArticleRequest request) {
         try {
-            Article updatedArticle = blogService.update(id, request);
-            return ResponseEntity.ok().body(updatedArticle);
-            //Response 객체 만들어서 컬럼 추가해서 수정가능한지 알림 보내기
+            ArticleResponse articleResponse = blogService.update(id, request);
+            return ResponseEntity.ok().body(articleResponse);
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

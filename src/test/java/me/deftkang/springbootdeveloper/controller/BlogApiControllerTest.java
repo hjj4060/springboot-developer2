@@ -5,9 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import me.deftkang.springbootdeveloper.api.ArticleAPI;
 import me.deftkang.springbootdeveloper.domain.Article;
 import me.deftkang.springbootdeveloper.dto.AddArticleRequest;
+import me.deftkang.springbootdeveloper.dto.ArticleResponse;
 import me.deftkang.springbootdeveloper.dto.ArticleViewResponse;
 import me.deftkang.springbootdeveloper.dto.UpdateArticleRequest;
 import me.deftkang.springbootdeveloper.repository.BlogRepository;
+import me.deftkang.springbootdeveloper.service.BlogService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -45,6 +47,10 @@ class BlogApiControllerTest {
 
     @Autowired
     BlogRepository blogRepository;
+
+
+    @Autowired
+    BlogService blogService;
 
     @Autowired
     ArticleAPI articleAPI;
@@ -201,9 +207,10 @@ class BlogApiControllerTest {
         assertThat(articles).isEmpty();
     }
 
-    @DisplayName("updateArticle: 블로그 글 수정에 성공한다.")
+    @DisplayName("블로그 글 수정에 성공한다.")
     @Test
     public void updateArticle() throws Exception {
+        //given
         final String url = "/api/article/{id}";
         final String title = "title";
         final String content = "content";
@@ -218,10 +225,12 @@ class BlogApiControllerTest {
 
         UpdateArticleRequest request = new UpdateArticleRequest(newTitle, newContent);
 
+        //when
         ResultActions result = mockMvc.perform(put(url, savedArticle.getId())
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(request)));
 
+        //then
         result.andExpect(status().isOk());
 
         Article article = blogRepository.findById(savedArticle.getId()).get();
@@ -230,57 +239,30 @@ class BlogApiControllerTest {
         assertThat(article.getContent()).isEqualTo(newContent);
     }
 
+    @DisplayName("게시글 수정시 생성일이 9일 지났을 때 하루가 지나면 수정할 수 없다는 메세지 보내기")
     @Test
-    @DisplayName("글 상세 조회시 생성일이 10일 됐을 때 수정 가능한 일 1로 보여준다.")
-    public void remainingModifiableDateValid1() throws Exception {
+    void test() throws Exception {
+        //given
         final String url = "/api/article/{id}";
         final String title = "title";
         final String content = "content";
+        final LocalDateTime createdAt = LocalDateTime.now().minusDays(9);
+        System.out.println("createdAt = " + createdAt);
 
         Article savedArticle = blogRepository.save(Article.builder()
                 .title(title)
                 .content(content)
                 .build());
 
-        UpdateArticleRequest request = new UpdateArticleRequest("new title", "new content");
-
-        ResultActions result = mockMvc.perform(put(url, savedArticle.getId())
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(objectMapper.writeValueAsString(request)));
-
-        //when
-        savedArticle.setCreatedAt(LocalDateTime.now().minusDays(10)); //10일전에 생성
-        long modifiableDate = articleAPI.calculateModifiableDate(savedArticle.getCreatedAt());
-        ArticleViewResponse response = new ArticleViewResponse(savedArticle, modifiableDate);
-
-        //then
-        Assertions.assertThat(response.getModifiableDate()).isEqualTo(1);
-    }
-
-    @Test
-    @DisplayName("글 상세 조회시 생성일이 10일이 지났을 때 됐을 때 수정 가능한 일 0으로 보여준다.")
-    public void remainingModifiableDateValid2() throws Exception {
-        final String url = "/api/article/{id}";
-        final String title = "title";
-        final String content = "content";
-
-        Article savedArticle = blogRepository.save(Article.builder()
-                .title(title)
-                .content(content)
-                .build());
-
-        UpdateArticleRequest request = new UpdateArticleRequest("new title", "new content");
-
-        ResultActions result = mockMvc.perform(put(url, savedArticle.getId())
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(objectMapper.writeValueAsString(request)));
+        System.out.println("savedArticle.getCreatedAt() = " + savedArticle.getCreatedAt());
+        final String newTitle = "new Title";
+        final String newContent = "new content";
+        UpdateArticleRequest request = new UpdateArticleRequest(newTitle, newContent);
 
         //when
-        savedArticle.setCreatedAt(LocalDateTime.now().minusDays(15)); //15일전에 생성
-        long modifiableDate = articleAPI.calculateModifiableDate(savedArticle.getCreatedAt());
-        ArticleViewResponse response = new ArticleViewResponse(savedArticle, modifiableDate);
+        ArticleResponse articleResponse =  blogService.update(savedArticle.getId(), request, createdAt);
 
         //then
-        Assertions.assertThat(response.getModifiableDate()).isEqualTo(0);
+        assertThat(articleResponse.getWarningMessage()).isEqualTo("하루가 지나면 수정하지 못합니다.");
     }
 }

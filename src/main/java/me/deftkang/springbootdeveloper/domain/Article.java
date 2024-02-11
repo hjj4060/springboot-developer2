@@ -18,6 +18,7 @@ import java.util.UUID;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SuperBuilder
 public class Article extends BaseEntity {
     @Id
     @GeneratedValue(generator = "UUID")

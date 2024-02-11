@@ -91,19 +91,46 @@ public class BlogService {
     }
 
     @Transactional
-    public Article update(UUID id, UpdateArticleRequest request) {
+    public ArticleResponse update(UUID id, UpdateArticleRequest request) {
         Article article = articleValidCheck(id);
+        System.out.println("article.getCreatedAt() = " + article.getCreatedAt());
+        long modifiableDate = articleAPI.calculateModifiableDate(article.getCreatedAt());
+        ArticleResponse articleResponse = new ArticleResponse(article, modifiableDate);
 
-        LocalDate localDate = LocalDate.now();
-        long diffDate = ChronoUnit.DAYS.between(article.getCreatedAt().toLocalDate(), localDate);
-
-        if (diffDate >= 10) {
+        System.out.println("modifiableDate = " + modifiableDate);
+        if (articleResponse.getModifiableDate() <= 0) {
             throw new IllegalStateException("게시물 수정 기간이 지났습니다.");
+        }
+
+        if (articleResponse.getModifiableDate() == 1) {
+            articleResponse.setWarningMessage("하루가 지나면 수정하지 못합니다.");
         }
 
         article.update(request.getTitle(), request.getContent());
 
-        return article;
+        return articleResponse;
+    }
+
+    //test 용
+    @Transactional
+    public ArticleResponse update(UUID id, UpdateArticleRequest request, LocalDateTime createdDateAt) {
+        Article article = articleValidCheck(id);
+        System.out.println("article.getCreatedAt() = " + article.getCreatedAt());
+        long modifiableDate = articleAPI.calculateModifiableDate(createdDateAt);
+        ArticleResponse articleResponse = new ArticleResponse(article, modifiableDate);
+
+        System.out.println("modifiableDate = " + modifiableDate);
+        if (articleResponse.getModifiableDate() <= 0) {
+            throw new IllegalStateException("게시물 수정 기간이 지났습니다.");
+        }
+
+        if (articleResponse.getModifiableDate() == 1) {
+            articleResponse.setWarningMessage("하루가 지나면 수정하지 못합니다.");
+        }
+
+        article.update(request.getTitle(), request.getContent());
+
+        return articleResponse;
     }
 
     private Article articleValidCheck(UUID id) {

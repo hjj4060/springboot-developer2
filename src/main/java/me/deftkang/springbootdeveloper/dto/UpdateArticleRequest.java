@@ -8,7 +8,6 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @NoArgsConstructor
-@AllArgsConstructor
 @Getter
 public class UpdateArticleRequest {
     private String title;
@@ -17,5 +16,11 @@ public class UpdateArticleRequest {
 
     public UpdateArticleRequest(String title, String content) {
         this(title, content, null);
+    }
+
+    public UpdateArticleRequest(String title, String content, LocalDateTime deletedAt) {
+        this.title = title;
+        this.content = content;
+        this.deletedAt = deletedAt;
     }
 }
