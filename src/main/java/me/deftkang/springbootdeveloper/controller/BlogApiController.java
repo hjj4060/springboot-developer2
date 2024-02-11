@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import me.deftkang.springbootdeveloper.domain.Article;
 import me.deftkang.springbootdeveloper.dto.AddArticleRequest;
 import me.deftkang.springbootdeveloper.dto.ArticleResponse;
+import me.deftkang.springbootdeveloper.dto.ArticleViewResponse;
 import me.deftkang.springbootdeveloper.dto.UpdateArticleRequest;
 import me.deftkang.springbootdeveloper.service.BlogService;
 import org.springframework.http.HttpStatus;
@@ -44,10 +45,7 @@ public class BlogApiController {
             @RequestParam(name = "createdOrder", defaultValue = "1") int createdOrder,
             @RequestParam(name = "title", required = false) String title) {
         //엔티티를 DTO로 변경하여 리스트에 담는 작업
-        List<ArticleResponse> articles = blogService.findAll(createdOrder, title)
-                .stream()
-                .map(ArticleResponse::new)
-                .toList();
+        List<ArticleResponse> articles = blogService.findAll(createdOrder, title);
 
         return ResponseEntity.ok()
                 .body(articles);
@@ -56,10 +54,10 @@ public class BlogApiController {
     @Operation(summary = "블로그 한개 글을 가져오는 API 입니다.")
     @GetMapping("/api/article/{id}")
     public ResponseEntity<ArticleResponse> findArticle(@PathVariable UUID id) {
-        Article article = blogService.findById(id);
+        ArticleResponse article = blogService.findById(id);
 
         return ResponseEntity.ok()
-                .body(new ArticleResponse(article));
+                .body(article);
     }
 
     @Operation(summary = "블로그 글을 삭제하는 API 입니다.")
@@ -87,6 +85,7 @@ public class BlogApiController {
         try {
             Article updatedArticle = blogService.update(id, request);
             return ResponseEntity.ok().body(updatedArticle);
+            //Response 객체 만들어서 컬럼 추가해서 수정가능한지 알림 보내기
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

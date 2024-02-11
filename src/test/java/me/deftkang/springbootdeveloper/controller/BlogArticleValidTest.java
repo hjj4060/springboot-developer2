@@ -31,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * 블로그 글 추가에 대한 유효성 검사
  */
-@SpringBootTest
+@SpringBootTest //통합테스트
 @AutoConfigureMockMvc
 public class BlogArticleValidTest {
 
@@ -79,9 +79,7 @@ public class BlogArticleValidTest {
     @DisplayName("블로그 title글자 수는 200자 이상 되면 안된다.")
     void articleTitleValid_X() throws Exception {
         final String url = "/api/articles";
-        final String title = "200자200자200자200자200자200자200자200자200자200자200자200자200자200자200자" +
-                "200자200자200자200자200자200자200자200자200자200자200자200자200자200자200자200자200자200자" +
-                "200자200자200자200자200자200자200자200자200자200자200자200자200자200자200자00000000";
+        final String title = "a".repeat(200);
         final String content = "content";
         final AddArticleRequest userRequest = new AddArticleRequest(title, content);
         final String requestBody = objectMapper.writeValueAsString(userRequest);
@@ -101,24 +99,7 @@ public class BlogArticleValidTest {
     void articleContentValid_O() throws Exception {
         final String url = "/api/articles";
         final String title = "title";
-        final String content = "글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체" +
-                "크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체" +
-                "크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체" +
-                "크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체" +
-                "크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크" +
-                "글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자" +
-                "수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체" +
-                "크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글" +
-                "자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체" +
-                "크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자" +
-                "수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크" +
-                "글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수" +
-                "체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글" +
-                "자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크" +
-                "글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자" +
-                "수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체" +
-                "크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글" +
-                "자수체크글자수체크글자수체크글자수체크글자수체크글자수체";
+        final String content = "a".repeat(999);
         final AddArticleRequest userRequest = new AddArticleRequest(title, content);
         final String requestBody = objectMapper.writeValueAsString(userRequest);
 
@@ -136,24 +117,7 @@ public class BlogArticleValidTest {
     void articleContentValid_X() throws Exception {
         final String url = "/api/articles";
         final String title = "title";
-        final String content = "글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체" +
-                "크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체" +
-                "크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체" +
-                "크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체" +
-                "크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크" +
-                "글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자" +
-                "수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체" +
-                "크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글" +
-                "자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체" +
-                "크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자" +
-                "수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크" +
-                "글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수" +
-                "체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글" +
-                "자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크" +
-                "글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자" +
-                "수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체" +
-                "크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글자수체크글" +
-                "자수체크글자수체크글자수체크글자수체크글자수체크글자수체크";
+        final String content = "a".repeat(1000);
         final AddArticleRequest userRequest = new AddArticleRequest(title, content);
         final String requestBody = objectMapper.writeValueAsString(userRequest);
 
@@ -217,6 +181,7 @@ public class BlogArticleValidTest {
     @Test
     @DisplayName("글 전체 조회 할시 deletedAt 필드에 데이터가 있으면 조회되면 안됩니다.")
     public void blogFindAllExcludeDeletedIsNull() throws Exception {
+        //given
         final String forUpdateDeletedAtUrl = "/api/article/{id}";
         final String title = "title";
         final String content = "content";

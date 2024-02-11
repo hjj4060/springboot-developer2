@@ -2,11 +2,12 @@ package me.deftkang.springbootdeveloper.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import me.deftkang.springbootdeveloper.api.ArticleAPI;
 import me.deftkang.springbootdeveloper.domain.Article;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 @NoArgsConstructor
@@ -18,18 +19,11 @@ public class ArticleViewResponse {
     private LocalDateTime createdAt;
     private long modifiableDate;
 
-    public ArticleViewResponse(Article article) {
+    public ArticleViewResponse(Article article, long modifiableDate) {
         this.id = article.getId();
         this.title = article.getTitle();
         this.content = article.getContent();
         this.createdAt = article.getCreatedAt();
-        this.modifiableDate = calculateModifiableDate(article.getCreatedAt());
-    }
-
-    public long calculateModifiableDate(LocalDateTime createdDatedAt) {
-        LocalDate localDate = LocalDate.now();
-        long diffDate = ChronoUnit.DAYS.between(createdDatedAt.toLocalDate(), localDate);
-
-        return 10 - diffDate;
+        this.modifiableDate = modifiableDate;
     }
 }
