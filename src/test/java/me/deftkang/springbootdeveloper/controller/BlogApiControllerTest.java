@@ -2,6 +2,7 @@ package me.deftkang.springbootdeveloper.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import me.deftkang.springbootdeveloper.api.ArticleAPI;
 import me.deftkang.springbootdeveloper.domain.Article;
 import me.deftkang.springbootdeveloper.dto.AddArticleRequest;
 import me.deftkang.springbootdeveloper.dto.ArticleViewResponse;
@@ -45,6 +46,9 @@ class BlogApiControllerTest {
     @Autowired
     BlogRepository blogRepository;
 
+    @Autowired
+    ArticleAPI articleAPI;
+
     @BeforeEach
     public void mockMvcSetup() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
@@ -77,6 +81,32 @@ class BlogApiControllerTest {
         assertThat(articles.get(0).getUpdatedAt()).isNotNull();
     }
 
+    @Test
+    @DisplayName("글 삭제 필드 업데이트에 성공한다.")
+    public void updateArticleDeleteAt() throws Exception {
+        final String url = "/api/article/{id}";
+        final String title = "title";
+        final String content = "content";
+
+        Article savedArticle = blogRepository.save(Article.builder()
+                .title(title)
+                .content(content)
+                .build());
+
+        //then
+        //새로운 글 추가시 deleteAt 필드 null인지 확인
+        Assertions.assertThat(savedArticle.getDeletedAt()).isNull();
+
+        //when
+        //deletedAt 필드 업데이트
+        ResultActions resultActions = mockMvc.perform(patch(url, savedArticle.getId()))
+                .andExpect(status().isOk());
+
+        Article article = blogRepository.findById(savedArticle.getId()).get();
+
+        Assertions.assertThat(article.getDeletedAt()).isNotNull();
+    }
+
     @DisplayName("findAllArticles: 블로그 글 목록 조회에 성공한다.")
     @Test
     public void findAllArticles() throws Exception {
@@ -101,6 +131,7 @@ class BlogApiControllerTest {
     @DisplayName("findAllArticles: 블로그 글 목록 created 역정렬 적용 조회에 성공한다.")
     @Test
     public void findAllArticlesCreatedOrderBy() throws Exception {
+        //given
         final String url = "/api/articles";
         final String title = "title";
         final String content = "content";
@@ -118,10 +149,12 @@ class BlogApiControllerTest {
                 .content(content2)
                 .build());
 
+        //when
         final ResultActions resultActions = mockMvc.perform(get(url)
                         .param("createdOrder", "2")
                 .accept(MediaType.APPLICATION_JSON));
 
+        //then
         resultActions
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].content").value(content2))
@@ -198,8 +231,8 @@ class BlogApiControllerTest {
     }
 
     @Test
-    @DisplayName("글 삭제 필드 업데이트에 성공한다.")
-    public void updateArticleDeleteAt() throws Exception {
+    @DisplayName("글 상세 조회시 생성일이 10일 됐을 때 수정 가능한 일 1로 보여준다.")
+    public void remainingModifiableDateValid1() throws Exception {
         final String url = "/api/article/{id}";
         final String title = "title";
         final String content = "content";
@@ -208,34 +241,6 @@ class BlogApiControllerTest {
                 .title(title)
                 .content(content)
                 .build());
-
-        //then
-        //새로운 글 추가시 deleteAt 필드 null인지 확인
-        Assertions.assertThat(savedArticle.getDeletedAt()).isNull();
-
-        //when
-        //deletedAt 필드 업데이트
-        ResultActions resultActions = mockMvc.perform(patch(url, savedArticle.getId()))
-                .andExpect(status().isOk());
-
-        Article article = blogRepository.findById(savedArticle.getId()).get();
-
-        Assertions.assertThat(article.getDeletedAt()).isNotNull();
-    }
-
-    @Test
-    @DisplayName("글 상세 조회시 수정 가능한 남은 날짜 조회")
-    public void remainingModifiableDate() throws Exception {
-        final String url = "/api/article/{id}";
-        final String title = "title";
-        final String content = "content";
-
-        Article savedArticle = blogRepository.save(Article.builder()
-                .title(title)
-                .content(content)
-                .build());
-
-        savedArticle.setCreatedAt(LocalDateTime.now().minusDays(10));
 
         UpdateArticleRequest request = new UpdateArticleRequest("new title", "new content");
 
@@ -243,9 +248,39 @@ class BlogApiControllerTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(request)));
 
-        ArticleViewResponse response = new ArticleViewResponse(savedArticle);
-        System.out.println(response.getModifiableDate());
+        //when
+        savedArticle.setCreatedAt(LocalDateTime.now().minusDays(10)); //10일전에 생성
+        long modifiableDate = articleAPI.calculateModifiableDate(savedArticle.getCreatedAt());
+        ArticleViewResponse response = new ArticleViewResponse(savedArticle, modifiableDate);
 
-        Assertions.assertThat(response.getModifiableDate()).isNotNull();
+        //then
+        Assertions.assertThat(response.getModifiableDate()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("글 상세 조회시 생성일이 10일이 지났을 때 됐을 때 수정 가능한 일 0으로 보여준다.")
+    public void remainingModifiableDateValid2() throws Exception {
+        final String url = "/api/article/{id}";
+        final String title = "title";
+        final String content = "content";
+
+        Article savedArticle = blogRepository.save(Article.builder()
+                .title(title)
+                .content(content)
+                .build());
+
+        UpdateArticleRequest request = new UpdateArticleRequest("new title", "new content");
+
+        ResultActions result = mockMvc.perform(put(url, savedArticle.getId())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(request)));
+
+        //when
+        savedArticle.setCreatedAt(LocalDateTime.now().minusDays(15)); //15일전에 생성
+        long modifiableDate = articleAPI.calculateModifiableDate(savedArticle.getCreatedAt());
+        ArticleViewResponse response = new ArticleViewResponse(savedArticle, modifiableDate);
+
+        //then
+        Assertions.assertThat(response.getModifiableDate()).isEqualTo(0);
     }
 }

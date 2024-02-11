@@ -1,10 +1,14 @@
 package me.deftkang.springbootdeveloper.service;
 
 import lombok.RequiredArgsConstructor;
+import me.deftkang.springbootdeveloper.api.ArticleAPI;
 import me.deftkang.springbootdeveloper.domain.Article;
 import me.deftkang.springbootdeveloper.dto.AddArticleRequest;
+import me.deftkang.springbootdeveloper.dto.ArticleResponse;
+import me.deftkang.springbootdeveloper.dto.ArticleViewResponse;
 import me.deftkang.springbootdeveloper.dto.UpdateArticleRequest;
 import me.deftkang.springbootdeveloper.repository.BlogRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +26,9 @@ public class BlogService {
 
     private final BlogRepository blogRepository;
 
+    @Autowired
+    private ArticleAPI articleAPI;
+
     public Article save(AddArticleRequest request) {
         return blogRepository.save(request.toEntity());
     }
@@ -32,7 +39,7 @@ public class BlogService {
         return blogRepository.findAll();
     }
 
-    public List<Article> findAll(int createdOrderByFlag, String title) {
+    public List<ArticleResponse> findAll(int createdOrderByFlag, String title) {
         List<Article> findAllArticles = null;
 
         if(title == null) {
@@ -53,13 +60,20 @@ public class BlogService {
             }
         }
 
-        return findAllArticles;
+        return findAllArticles.stream().map(article -> {
+            long modifiableDate = articleAPI.calculateModifiableDate(article.getCreatedAt());
+            return new ArticleResponse(article, modifiableDate);
+        }).toList();
     }
 
-    @Transactional(readOnly = true) //readOnly 옵션 true로 하면 락을 안건다??
-    public Article findById(UUID id) {
-        return blogRepository.findById(id)
+    @Transactional(readOnly = true)
+    public ArticleResponse findById(UUID id) {
+        Article article = blogRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("not found: " + id));
+
+        long modifiableDate = articleAPI.calculateModifiableDate(article.getCreatedAt());
+
+        return new ArticleResponse(article, modifiableDate);
     }
 
     public void delete(UUID id) {

@@ -3,6 +3,7 @@ package me.deftkang.springbootdeveloper.controller;
 import lombok.RequiredArgsConstructor;
 import me.deftkang.springbootdeveloper.domain.Article;
 import me.deftkang.springbootdeveloper.dto.ArticleListViewResponse;
+import me.deftkang.springbootdeveloper.dto.ArticleResponse;
 import me.deftkang.springbootdeveloper.dto.ArticleViewResponse;
 import me.deftkang.springbootdeveloper.service.BlogService;
 import org.springframework.stereotype.Controller;
@@ -25,9 +26,7 @@ public class BlogViewController {
             @RequestParam(name = "createdOrder", defaultValue = "1") int createdOrder,
             @RequestParam(name = "title", required = false) String title
             , Model model) {
-        List<ArticleListViewResponse> articles = blogService.findAll(createdOrder, title).stream()
-                .map(ArticleListViewResponse::new)
-                .toList();
+        List<ArticleResponse> articles = blogService.findAll(createdOrder, title);
 
         model.addAttribute("articles", articles);
 
@@ -36,8 +35,8 @@ public class BlogViewController {
 
     @GetMapping("/article/{id}")
     public String getArticle(@PathVariable UUID id, Model model) {
-        Article article = blogService.findById(id);
-        model.addAttribute("article", new ArticleViewResponse(article));
+        ArticleResponse articleResponse = blogService.findById(id);
+        model.addAttribute("article", articleResponse);
 
         return "article";
     }
@@ -47,8 +46,8 @@ public class BlogViewController {
         if (id == null) {
             model.addAttribute("article", new ArticleViewResponse());
         } else {
-            Article article = blogService.findById(id);
-            model.addAttribute("article", new ArticleViewResponse(article));
+            ArticleResponse articleResponse = blogService.findById(id);
+            model.addAttribute("article", articleResponse);
         }
 
         return "newArticle";
