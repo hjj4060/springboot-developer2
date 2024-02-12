@@ -26,8 +26,13 @@ dependencies {
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-}
 
+    //security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+    implementation 'org.springframework.security:spring-security-test'
+
+}
 test {
     useJUnitPlatform()
 }
