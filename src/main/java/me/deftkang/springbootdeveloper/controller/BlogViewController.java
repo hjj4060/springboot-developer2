@@ -29,7 +29,7 @@ public class BlogViewController {
         List<ArticleResponse> articles = blogService.findAll(createdOrder, title);
 
         model.addAttribute("articles", articles);
-
+        
         return "articleList";
     }
 
