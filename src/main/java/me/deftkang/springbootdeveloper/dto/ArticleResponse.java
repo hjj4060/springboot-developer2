@@ -1,10 +1,7 @@
 package me.deftkang.springbootdeveloper.dto;
 
 import lombok.Getter;
-import me.deftkang.springbootdeveloper.api.ArticleAPI;
 import me.deftkang.springbootdeveloper.domain.Article;
-
-import java.time.LocalDateTime;
 
 @Getter
 public class ArticleResponse {
@@ -12,6 +9,7 @@ public class ArticleResponse {
     private final String content;
     private long modifiableDate;
     private String warningMessage;
+    private String errorMessage;
 
     public ArticleResponse(Article article, long modifiableDate) {
         this.title = article.getTitle();
@@ -20,5 +18,9 @@ public class ArticleResponse {
     }
     public void setWarningMessage(String warningMessage) {
         this.warningMessage = warningMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
     }
 }

@@ -1,8 +1,6 @@
 package me.deftkang.springbootdeveloper.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import me.deftkang.springbootdeveloper.api.ArticleAPI;
 import me.deftkang.springbootdeveloper.domain.Article;
 import me.deftkang.springbootdeveloper.dto.AddArticleRequest;
 import me.deftkang.springbootdeveloper.dto.ArticleViewResponse;
@@ -24,7 +22,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -50,9 +47,6 @@ public class BlogArticleValidTest {
 
     @Autowired
     private WebApplicationContext context;
-
-    @Autowired
-    ArticleAPI articleAPI;
 
     @BeforeEach
     public void mockMvcSetup() {
@@ -188,7 +182,7 @@ public class BlogArticleValidTest {
     @DisplayName("글 전체 조회 할시 deletedAt 필드에 데이터가 있으면 조회되면 안됩니다.")
     public void blogFindAllExcludeDeletedIsNull() throws Exception {
         //given
-        final String forUpdateDeletedAtUrl = "/api/article/{id}";
+        final String forUpdateDeletedAtUrl = "/api/articles/{id}";
         final String title = "title";
         final String content = "content";
 
@@ -235,7 +229,7 @@ public class BlogArticleValidTest {
 
         //when
         savedArticle.setCreatedAt(LocalDateTime.now().minusDays(9)); //9일전에 생성
-        long modifiableDate = articleAPI.calculateModifiableDate(savedArticle.getCreatedAt());
+        long modifiableDate = savedArticle.calculateModifiableDate(savedArticle.getCreatedAt());
         ArticleViewResponse response = new ArticleViewResponse(savedArticle, modifiableDate);
 
         //then
@@ -264,7 +258,7 @@ public class BlogArticleValidTest {
         savedArticle.setCreatedAt(LocalDateTime.now().minusDays(15)); //15일전에 생성
 
         //when
-        long modifiableDate = articleAPI.calculateModifiableDate(savedArticle.getCreatedAt());
+        long modifiableDate = savedArticle.calculateModifiableDate(savedArticle.getCreatedAt());
         ArticleViewResponse response = new ArticleViewResponse(savedArticle, modifiableDate);
 
         //then

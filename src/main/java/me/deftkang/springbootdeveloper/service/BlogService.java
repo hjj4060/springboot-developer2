@@ -1,22 +1,15 @@
 package me.deftkang.springbootdeveloper.service;
 
 import lombok.RequiredArgsConstructor;
-import me.deftkang.springbootdeveloper.api.ArticleAPI;
 import me.deftkang.springbootdeveloper.domain.Article;
 import me.deftkang.springbootdeveloper.dto.AddArticleRequest;
 import me.deftkang.springbootdeveloper.dto.ArticleResponse;
-import me.deftkang.springbootdeveloper.dto.ArticleViewResponse;
 import me.deftkang.springbootdeveloper.dto.UpdateArticleRequest;
 import me.deftkang.springbootdeveloper.repository.BlogRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Period;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,9 +18,6 @@ import java.util.UUID;
 public class BlogService {
 
     private final BlogRepository blogRepository;
-
-    @Autowired
-    private ArticleAPI articleAPI;
 
     public Article save(AddArticleRequest request) {
         return blogRepository.save(request.toEntity());
@@ -61,7 +51,7 @@ public class BlogService {
         }
 
         return findAllArticles.stream().map(article -> {
-            long modifiableDate = articleAPI.calculateModifiableDate(article.getCreatedAt());
+            long modifiableDate = article.calculateModifiableDate(article.getCreatedAt());
             return new ArticleResponse(article, modifiableDate);
         }).toList();
     }
@@ -71,7 +61,7 @@ public class BlogService {
         Article article = blogRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("not found: " + id));
 
-        long modifiableDate = articleAPI.calculateModifiableDate(article.getCreatedAt());
+        long modifiableDate = article.calculateModifiableDate(article.getCreatedAt());
 
         return new ArticleResponse(article, modifiableDate);
     }
@@ -93,11 +83,9 @@ public class BlogService {
     @Transactional
     public ArticleResponse update(UUID id, UpdateArticleRequest request) {
         Article article = articleValidCheck(id);
-        System.out.println("article.getCreatedAt() = " + article.getCreatedAt());
-        long modifiableDate = articleAPI.calculateModifiableDate(article.getCreatedAt());
+        long modifiableDate = article.calculateModifiableDate(article.getCreatedAt());
         ArticleResponse articleResponse = new ArticleResponse(article, modifiableDate);
 
-        System.out.println("modifiableDate = " + modifiableDate);
         if (articleResponse.getModifiableDate() <= 0) {
             throw new IllegalStateException("게시물 수정 기간이 지났습니다.");
         }
@@ -115,11 +103,9 @@ public class BlogService {
     @Transactional
     public ArticleResponse update(UUID id, UpdateArticleRequest request, LocalDateTime createdDateAt) {
         Article article = articleValidCheck(id);
-        System.out.println("article.getCreatedAt() = " + article.getCreatedAt());
-        long modifiableDate = articleAPI.calculateModifiableDate(createdDateAt);
+        long modifiableDate = article.calculateModifiableDate(createdDateAt);
         ArticleResponse articleResponse = new ArticleResponse(article, modifiableDate);
 
-        System.out.println("modifiableDate = " + modifiableDate);
         if (articleResponse.getModifiableDate() <= 0) {
             throw new IllegalStateException("게시물 수정 기간이 지났습니다.");
         }

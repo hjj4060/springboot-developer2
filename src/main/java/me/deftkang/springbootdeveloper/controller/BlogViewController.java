@@ -33,7 +33,7 @@ public class BlogViewController {
         return "articleList";
     }
 
-    @GetMapping("/article/{id}")
+    @GetMapping("/articles/{id}")
     public String getArticle(@PathVariable UUID id, Model model) {
         ArticleResponse articleResponse = blogService.findById(id);
         model.addAttribute("article", articleResponse);
@@ -41,7 +41,7 @@ public class BlogViewController {
         return "article";
     }
 
-    @GetMapping("/new-article")
+    @GetMapping("/new-articles")
     public String newArticle(@RequestParam(required = false) UUID id, Model model) {
         if (id == null) {
             model.addAttribute("article", new ArticleViewResponse());

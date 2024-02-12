@@ -1,12 +1,9 @@
 package me.deftkang.springbootdeveloper.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import me.deftkang.springbootdeveloper.api.ArticleAPI;
 import me.deftkang.springbootdeveloper.domain.Article;
 import me.deftkang.springbootdeveloper.dto.AddArticleRequest;
 import me.deftkang.springbootdeveloper.dto.ArticleResponse;
-import me.deftkang.springbootdeveloper.dto.ArticleViewResponse;
 import me.deftkang.springbootdeveloper.dto.UpdateArticleRequest;
 import me.deftkang.springbootdeveloper.repository.BlogRepository;
 import me.deftkang.springbootdeveloper.service.BlogService;
@@ -23,7 +20,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -51,9 +47,6 @@ class BlogApiControllerTest {
 
     @Autowired
     BlogService blogService;
-
-    @Autowired
-    ArticleAPI articleAPI;
 
     @BeforeEach
     public void mockMvcSetup() {
@@ -90,7 +83,7 @@ class BlogApiControllerTest {
     @Test
     @DisplayName("글 삭제 필드 업데이트에 성공한다.")
     public void updateArticleDeleteAt() throws Exception {
-        final String url = "/api/article/{id}";
+        final String url = "/api/articles/{id}";
         final String title = "title";
         final String content = "content";
 
@@ -170,7 +163,7 @@ class BlogApiControllerTest {
     @DisplayName("findArticle: 블로그 글 조회에 성공한다.")
     @Test
     public void findArticle() throws Exception {
-        final String url = "/api/article/{id}";
+        final String url = "/api/articles/{id}";
         final String title = "title";
         final String content = "content";
 
@@ -190,7 +183,7 @@ class BlogApiControllerTest {
     @DisplayName("deleteArticle: 블로그 글 삭제에 성공한다.")
     @Test
     public void deletedArticle() throws Exception {
-        final String url = "/api/article/{id}";
+        final String url = "/api/articles/{id}";
         final String title = "title";
         final String content = "content";
 
@@ -211,7 +204,7 @@ class BlogApiControllerTest {
     @Test
     public void updateArticle() throws Exception {
         //given
-        final String url = "/api/article/{id}";
+        final String url = "/api/articles/{id}";
         final String title = "title";
         final String content = "content";
 
@@ -241,7 +234,7 @@ class BlogApiControllerTest {
 
     @DisplayName("게시글 수정시 생성일이 9일 지났을 때 하루가 지나면 수정할 수 없다는 메세지 보내기")
     @Test
-    void test() throws Exception {
+    void updateArticleValid() throws Exception {
         //given
         final String url = "/api/article/{id}";
         final String title = "title";
