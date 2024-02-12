@@ -52,7 +52,7 @@ public class BlogApiController {
     }
 
     @Operation(summary = "블로그 한개 글을 가져오는 API 입니다.")
-    @GetMapping("/api/article/{id}")
+    @GetMapping("/api/articles/{id}")
     public ResponseEntity<ArticleResponse> findArticle(@PathVariable UUID id) {
         ArticleResponse article = blogService.findById(id);
 
@@ -61,7 +61,7 @@ public class BlogApiController {
     }
 
     @Operation(summary = "블로그 글을 삭제하는 API 입니다.")
-    @DeleteMapping("api/article/{id}")
+    @DeleteMapping("api/articles/{id}")
     public ResponseEntity<Void> deleteArticle(@PathVariable UUID id) {
         blogService.delete(id);
 
@@ -70,7 +70,7 @@ public class BlogApiController {
     }
 
     @Operation(summary = "블로그 글을 삭제 날짜를 업데이트 하는 API 입니다.")
-    @PatchMapping("api/article/{id}") //Article의 deltedAt 필드만 수정하는거여서 PatchMapping 사용
+    @PatchMapping("api/articles/{id}") //Article의 deltedAt 필드만 수정하는거여서 PatchMapping 사용
     public ResponseEntity<Void> updateArticleDeleteAt(@PathVariable UUID id) {
         Article article = blogService.updateDeleteAt(id);
 
@@ -79,7 +79,7 @@ public class BlogApiController {
     }
 
     @Operation(summary = "블로그 글을 수정하는 API 입니다.")
-    @PutMapping("api/article/{id}")
+    @PutMapping("api/articles/{id}")
     public ResponseEntity<?> updateArticle(@PathVariable UUID id,
                                                  @RequestBody UpdateArticleRequest request) {
         try {

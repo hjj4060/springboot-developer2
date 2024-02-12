@@ -2,10 +2,7 @@ package me.deftkang.springbootdeveloper.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import me.deftkang.springbootdeveloper.api.ArticleAPI;
 import me.deftkang.springbootdeveloper.domain.Article;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
